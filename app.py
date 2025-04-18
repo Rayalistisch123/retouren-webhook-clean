@@ -30,6 +30,8 @@ def webhook():
         sku = item.get('fulfillment_product', {}).get('sku', '')
         quantity = item.get('amount_expected', 0)
         reason = item.get('reason', '')
+        product_name = item.get('fulfillment_product', {}).get('name', '')
+
 
         # Alleen verwerken als er iets retour komt
         if quantity and int(quantity) > 0:
@@ -49,7 +51,8 @@ def webhook():
                 brand,
                 sku,
                 quantity,
-                reason
+                reason,
+                product_name
             ])
 
     return 'OK', 200
