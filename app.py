@@ -22,11 +22,12 @@ sheet = client.open("Retouren Overzicht").sheet1
 # QLS Auth gegevens
 QLS_USERNAME = os.environ.get("QLS_USERNAME")
 QLS_PASSWORD = os.environ.get("QLS_PASSWORD")
+QLS_COMPANY_ID = os.environ.get("QLS_COMPANY_ID")
 
 # Functie om productnaam op te halen uit QLS API
 
 def get_product_name_from_qls(product_id):
-    url = f"https://api.pakketdienstqls.nl/product/{product_id}"
+    url = f"https://api.pakketdienstqls.nl/companies/{QLS_COMPANY_ID}/fulfillment_products/{product_id}"
     response = requests.get(url, auth=HTTPBasicAuth(QLS_USERNAME, QLS_PASSWORD))
 
     if response.status_code == 200:
