@@ -8,6 +8,7 @@ from datetime import datetime
 import requests
 from requests.auth import HTTPBasicAuth
 
+# Laad omgevingsvariabelen
 load_dotenv()
 
 app = Flask(__name__)
@@ -24,15 +25,19 @@ QLS_USERNAME = os.environ.get("QLS_USERNAME")
 QLS_PASSWORD = os.environ.get("QLS_PASSWORD")
 QLS_COMPANY_ID = os.environ.get("QLS_COMPANY_ID")
 
-# Functie om productnaam op te halen uit QLS API
+# Functie om productnaam op te halen via QLS JSON-API
 
 def get_product_name_from_qls(product_id):
+    if not product_id:
+        return ""
     url = f"https://api.pakketdienstqls.nl/companies/{QLS_COMPANY_ID}/fulfillment_products/{product_id}"
     response = requests.get(url, auth=HTTPBasicAuth(QLS_USERNAME, QLS_PASSWORD))
-
     if response.status_code == 200:
-        data = response.json()
-        return data.get("name", "")
+        payload = response.json()
+        # JSON-API wrapper: naam zit in data.attributes.name
+        return payload.get("data", {}) \
+                      .get("attributes", {}) \
+                      .get("name", "")
     else:
         print(f"❌ Fout bij ophalen productnaam voor ID {product_id}. Status: {response.status_code}")
         return ""
@@ -44,16 +49,16 @@ def webhook():
     print(data)
 
     items = data.get('return_products', [])
-    print(f"Items gevonden: {items}")
-
     for item in items:
         sku = item.get('fulfillment_product', {}).get('sku', '')
         quantity = item.get('amount_expected', 0)
         reason = item.get('reason', '')
         product_id = item.get('fulfillment_product', {}).get('id', '')
-        product_name = get_product_name_from_qls(product_id)
 
+        # Alleen verwerken als er iets retour komt
         if quantity and int(quantity) > 0:
+            # Haal de productnaam op
+            product_name = get_product_name_from_qls(product_id)
             timestamp = datetime.utcnow().isoformat()
             return_id = data.get('id', '')
             status = data.get('status', '')
@@ -61,6 +66,7 @@ def webhook():
             tracking = data.get('return_shipment', {}).get('tracking_number', '')
             brand = data.get('brand', {}).get('name', '')
 
+            # Schrijf naar Google Sheet
             sheet.append_row([
                 timestamp,
                 return_id,
