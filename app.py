@@ -50,7 +50,7 @@ def webhook():
         sku = item.get('fulfillment_product', {}).get('sku', '')
         quantity = item.get('amount_expected', 0)
         reason = item.get('reason', '')
-        product_id = item.get('product_id', '')
+        product_id = item.get('fulfillment_product', {}).get('id', '')
         product_name = get_product_name_from_qls(product_id)
 
         if quantity and int(quantity) > 0:
