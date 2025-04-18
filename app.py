@@ -41,7 +41,7 @@ def webhook():
             customer = data.get('consumer_contact', {}).get('name', '')
             tracking = data.get('return_shipment', {}).get('tracking_number', '')
             brand = data.get('brand', {}).get('name', '')
-            product_name = item.get('fulfillment_product', {}).get('name', '')
+            
 
             sheet.append_row([
                 timestamp,
