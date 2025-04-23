@@ -24,7 +24,7 @@ scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/au
 creds_dict = json.loads(GOOGLE_CREDS_JSON)
 creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
-sheet = client.open("Retouren Overzicht").sheet1
+sheet = client.open("Retouren Overzicht").worksheet("Blad1")
 
 # Functie om productnaam op te halen via QLS list endpoint met SKU filter
 
